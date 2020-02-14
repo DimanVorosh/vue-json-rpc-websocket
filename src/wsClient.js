@@ -100,7 +100,6 @@ export default class WebSocketClient {
   }
 
   reconnect () {
-    console.log(this.reconnectCount, this.reconnectAttempts)
     if (this.reconnectCount <= this.reconnectAttempts) {
       this.reconnectCount++
       delete this.instance
