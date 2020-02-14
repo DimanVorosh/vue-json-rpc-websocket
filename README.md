@@ -172,7 +172,7 @@ export default new Vuex.Store({
     },
 
     socket_on_message ({ commit }, message) {
-      console.log('Data received:  + message.result)
+      console.log('Data received:'  + message.result)
     },
 
     socket_reconnect ({ commit }, count) {
