@@ -1,0 +1,22 @@
+{
+  "name": "vue-json-rpc-websocket",
+  "version": "1.0.0",
+  "description": "JSON-RPC Websocket client for VueJS with Vuex integration ",
+  "main": "wsClient.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Dmitry Voroshillo",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DimanVorosh/vue-json-rpc-websocket.git"
+  },
+  "keywords": [
+    "vuejs"
+  ],
+  "bugs": {
+    "url": "https://github.com/DimanVorosh/vue-json-rpc-websocket/issues"
+  },
+  "homepage": "https://github.com/DimanVorosh/vue-json-rpc-websocket#readme"
+}
