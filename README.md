@@ -30,7 +30,7 @@ Vue.use(JRPCWS, 'wss://echo.websocket.org', {
 
 ``` js
 import store from './store'
-Vue.use(VueNativeSock, 'wss://echo.websocket.org', { store: store })
+Vue.use(JRPCWS, 'wss://echo.websocket.org', { store: store })
 ```
 
 ## Usage in Vue components
