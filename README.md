@@ -164,11 +164,11 @@ export default new Vuex.Store({
       } else {
         console.error('Connection failure')
       }
-      console.error('Code: ' + event.code + ' причина: ' + event.reason)
+      console.error('Code: ' + event.code)
     },
 
     socket_on_error ({ commit }, event) {
-      console.error("Error: " + event.message)
+      console.error('Error')
     },
 
     socket_on_message ({ commit }, message) {
