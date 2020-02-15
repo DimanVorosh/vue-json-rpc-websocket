@@ -71,12 +71,12 @@ export default {
 `sendObj`
 
 ```js
-this.$socketClient.sendObj(method, params, action)
+this.$socket.sendObj(method, params, action)
 ```
 
 ### Example
 ```js
-this.$socketClient.sendObj('example', { hello: 'world' }, 'getHelloWorld')
+this.$socket.sendObj('example', { hello: 'world' }, 'getHelloWorld')
 ```
 Vuex module with example action:
 
