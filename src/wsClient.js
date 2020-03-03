@@ -37,7 +37,7 @@ export default class WebSocketClient {
       reconnectEnabled: false,
       reconnectInterval: 0,
       recconectAttempts: 0,
-      store: undefined
+      store: null
     }
   }
 
@@ -114,10 +114,12 @@ export default class WebSocketClient {
 
   sendObj (method, params, action = '') {
     let id = Math.floor(Math.random() * 10000) + 1
-    this.wsData.push({
-      id: id,
-      action: action
-    })
+    if (action) {
+      this.wsData.push({
+        id: id,
+        action: action
+      })
+    }
     this.instance.send(this.createMessage(method, params, id))
   }
 }
