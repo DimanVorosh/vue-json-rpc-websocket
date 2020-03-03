@@ -37,7 +37,7 @@ export default class WebSocketClient {
       reconnectEnabled: false,
       reconnectInterval: 0,
       recconectAttempts: 0,
-      store: null
+      store: undefined
     }
   }
 
@@ -71,10 +71,13 @@ export default class WebSocketClient {
       if (typeof this.onMessage === 'function') {
         this.onMessage(data)
       } else if (this.store) {
-        this.store.dispatch(
-          this.wsData.filter(item => item.id === data.id)[0].action,
-          data.result
-        )
+        let current = this.wsData.filter(item => item.id === data.id)[0]
+        if (current) {
+          this.store.dispatch(
+            current.action,
+            data.result
+          )
+        }
         this.passToStore('socket_on_message', data)
       }
     }
