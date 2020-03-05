@@ -71,12 +71,12 @@ export default {
 `sendObj`
 
 ```js
-this.$socket.sendObj(method, params, action)
+this.$socket.sendData(method, params, action)
 ```
 
 ### Example
 ```js
-this.$socket.sendObj('example', { hello: 'world' }, 'getHelloWorld')
+this.$socket.sendData('example', { hello: 'world' }, 'setData')
 ```
 Vuex module with example action:
 
@@ -90,12 +90,6 @@ export default {
   mutations: {
     setData (state, data) {
       state.data.push(data)
-    }
-  },
-
-  actions: {
-    getHelloWorld ({ commit }, data) {
-      commit('setData', data)
     }
   }
 }
@@ -114,7 +108,7 @@ export default {
   name: 'App',
 
   created () {
-    this.$socket.onOpen = () => this.$socket.sendObj('example', { hello: 'world' }, 'getHelloWorld')
+    this.$socket.onOpen = () => this.$socket.sendData('example', { hello: 'world' }, 'setData')
   },
 
   computed: {
@@ -142,23 +136,13 @@ export default new Vuex.Store({
   },
 
   mutations: {
-    setConnected (state) {
-      state.socket.isConnected = true
-    },
-
-    setDisconnected (state) {
-      state.socket.isConnected = false
-    }
-  },
-
-  actions: {
     socket_on_open ({ state, commit }, event) {
-      commit('setConnected')
+      state.socket.isConnected = true
       console.log('Socket connected')
     },
 
     socket_on_close ({ commit }, event) {
-      commit('setDisconnected')
+      state.socket.isConnected = false
       if (event.wasClean) {
         console.log('Socket closed clear')
       } else {
