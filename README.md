@@ -68,7 +68,7 @@ export default {
 
 ## Sending messages
 
-`sendObj`
+`sendData`
 
 ```js
 this.$socket.sendData(method, params, action)
