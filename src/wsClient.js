@@ -18,6 +18,7 @@ export default class WebSocketClient {
     }
 
     this.wsData = []
+    this.methodsData = []
 
     this.onOpen = null
     this.onMessage = null
@@ -37,13 +38,13 @@ export default class WebSocketClient {
       reconnectEnabled: false,
       reconnectInterval: 0,
       recconectAttempts: 0,
-      store: undefined
+      store: null
     }
   }
 
   passToStore (eventName, event) {
     if (!eventName.startsWith('socket_')) { return }
-    let method = 'dispatch'
+    let method = 'commit'
     let target = eventName
     let msg = event
     if (event.data) {
@@ -61,9 +62,8 @@ export default class WebSocketClient {
       }
       if (typeof this.onOpen === 'function') {
         this.onOpen()
-      } else if (this.store) {
-        this.passToStore('socket_on_open', event)
       }
+      if (this.store) this.passToStore('socket_on_open', event)
     }
 
     this.instance.onmessage = (msg) => {
@@ -71,10 +71,15 @@ export default class WebSocketClient {
       if (typeof this.onMessage === 'function') {
         this.onMessage(data)
       } else if (this.store) {
-        let current = this.wsData.filter(item => item.id === data.id)[0]
+        let current = null
+        if (msg.id !== 0) {
+          current = this.wsData.filter(item => item.id === data.id)[0]
+        } else {
+          current = this.methodsData.filter(item => item.method === msg.method)
+        }
         if (current) {
-          this.store.dispatch(
-            current.action,
+          this.store.commit(
+            current.mutation,
             data.result
           )
         }
@@ -115,12 +120,23 @@ export default class WebSocketClient {
     }
   }
 
-  sendObj (method, params, action = '') {
+  sendData (method, params, mutation = null) {
     let id = Math.floor(Math.random() * 10000) + 1
-    if (action) {
+    if (mutation) {
       this.wsData.push({
         id: id,
-        action: action
+        mutation: mutation
+      })
+    }
+    this.instance.send(this.createMessage(method, params, id))
+  }
+
+  sendToClient (method, params, mutation = null) {
+    let id = Math.floor(Math.random() * 10000) + 1
+    if (mutation) {
+      this.methodsData.push({
+        method: method,
+        mutation: mutation
       })
     }
     this.instance.send(this.createMessage(method, params, id))
