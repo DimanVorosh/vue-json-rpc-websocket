@@ -17,6 +17,7 @@ export default class WebSocketClient {
       }
     }
 
+    this.beforeConnected = []
     this.wsData = []
     this.methodsData = []
 
@@ -57,29 +58,36 @@ export default class WebSocketClient {
     this.instance = new WebSocket(this.url)
 
     this.instance.onopen = () => {
+      this.beforeConnected.forEach(message => this.instance.send(message))
+      this.beforeConnected = []
+
       if (this.reconnectEnabled) {
         this.reconnectCount = 1
       }
+
       if (typeof this.onOpen === 'function') {
         this.onOpen()
       }
+
       if (this.store) this.passToStore('socket_on_open', event)
     }
 
     this.instance.onmessage = (msg) => {
       let data = JSON.parse(msg.data)
+
       if (typeof this.onMessage === 'function') {
         this.onMessage(data)
       } else if (this.store) {
         let current
+
         if (msg.id !== 0) {
           current = this.wsData.filter(item => item.id === data.id)[0]
         } else {
-          current = this.methodsData.filter(item => {
-            item.method === msg.method
-            JSON.stringify(item.params) === JSON.stringify(msg.params)
-          })[0]
+          current = this.methodsData.filter(item =>
+            item.method === msg.method && JSON.stringify(item.params) === JSON.stringify(msg.params)
+          )[0]
         }
+
         if (current) {
           this.store.commit(
             current.mutation,
@@ -96,6 +104,7 @@ export default class WebSocketClient {
       } else if (this.store) {
         this.passToStore('socket_on_close', e)
       }
+
       if (!e.wasClean && this.reconnectEnabled) {
         this.reconnect()
       }
@@ -131,7 +140,13 @@ export default class WebSocketClient {
         mutation: mutation
       })
     }
-    this.instance.send(this.createMessage(method, params, id))
+
+    const message = this.createMessage(method, params, id)
+    if (this.instance.readyState === WebSocket.OPEN) {
+      this.instance.send(message)
+    } else {
+      this.beforeConnected.push(message)
+    }
   }
 
   sendToClient (method, params, mutation = null) {
@@ -143,6 +158,12 @@ export default class WebSocketClient {
         mutation: mutation
       })
     }
-    this.instance.send(this.createMessage(method, params, id))
+
+    const message = this.createMessage(method, params, id)
+    if (this.instance.readyState === WebSocket.OPEN) {
+      this.instance.send(message)
+    } else {
+      this.beforeConnected.push(message)
+    }
   }
 }
