@@ -71,11 +71,14 @@ export default class WebSocketClient {
       if (typeof this.onMessage === 'function') {
         this.onMessage(data)
       } else if (this.store) {
-        let current = null
+        let current
         if (msg.id !== 0) {
           current = this.wsData.filter(item => item.id === data.id)[0]
         } else {
-          current = this.methodsData.filter(item => item.method === msg.method)
+          current = this.methodsData.filter(item => {
+            item.method === msg.method
+            JSON.stringify(item.params) === JSON.stringify(msg.params)
+          })[0]
         }
         if (current) {
           this.store.commit(
@@ -136,6 +139,7 @@ export default class WebSocketClient {
     if (mutation) {
       this.methodsData.push({
         method: method,
+        params: params,
         mutation: mutation
       })
     }
