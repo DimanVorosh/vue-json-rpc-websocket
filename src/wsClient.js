@@ -19,7 +19,6 @@ export default class WebSocketClient {
 
     this.beforeConnected = []
     this.wsData = []
-    this.methodsData = []
 
     this.onOpen = null
     this.onMessage = null
@@ -78,22 +77,15 @@ export default class WebSocketClient {
       if (typeof this.onMessage === 'function') {
         this.onMessage(data)
       } else if (this.store) {
-        let current
-
-        if (msg.id !== 0) {
-          current = this.wsData.filter(item => item.id === data.id)[0]
-        } else {
-          current = this.methodsData.filter(item =>
-            item.method === msg.method && JSON.stringify(item.params) === JSON.stringify(msg.params)
-          )[0]
-        }
+        let current = this.wsData.filter(item => item.id === data.id)[0]
 
         if (current) {
           this.store.commit(
             current.mutation,
-            data.result
+            data.result ? data.result : data.params
           )
         }
+
         this.passToStore('socket_on_message', data)
       }
     }
@@ -137,24 +129,6 @@ export default class WebSocketClient {
     if (mutation) {
       this.wsData.push({
         id: id,
-        mutation: mutation
-      })
-    }
-
-    const message = this.createMessage(method, params, id)
-    if (this.instance.readyState === WebSocket.OPEN) {
-      this.instance.send(message)
-    } else {
-      this.beforeConnected.push(message)
-    }
-  }
-
-  sendToClient (method, params, mutation = null) {
-    let id = Math.floor(Math.random() * 10000) + 1
-    if (mutation) {
-      this.methodsData.push({
-        method: method,
-        params: params,
         mutation: mutation
       })
     }
