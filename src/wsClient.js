@@ -15,6 +15,9 @@ export default class WebSocketClient {
       if (options.store) {
         this.store = options.store
       }
+      if (options.eventAfterMutation) {
+        this.eventAfterMutation = options.eventAfterMutation
+      }
     }
 
     this.beforeConnected = []
@@ -38,6 +41,7 @@ export default class WebSocketClient {
       reconnectEnabled: false,
       reconnectInterval: 0,
       recconectAttempts: 0,
+      eventAfterMutation: true,
       store: null
     }
   }
@@ -74,9 +78,8 @@ export default class WebSocketClient {
     this.instance.onmessage = (msg) => {
       let data = JSON.parse(msg.data)
 
-      if (typeof this.onMessage === 'function') {
-        this.onMessage(data)
-      } else if (this.store) {
+      // Call the store mutation, if any
+      if (this.store) {
         let current = this.wsData.filter(item => item.id === data.id)[0]
 
         if (current) {
@@ -87,6 +90,13 @@ export default class WebSocketClient {
         }
 
         this.passToStore('socket_on_message', data)
+      }
+
+      // store not available OR even after mutation set to true, let's try to trigger the onMessage event
+      if ( this.eventAfterMutation || !this.store ) {
+        if (typeof this.onMessage === 'function') {
+          this.onMessage(data)
+        }
       }
     }
 
