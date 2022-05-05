@@ -140,7 +140,10 @@ export default class WebSocketClient {
 
   sendData (method, params, mutation = null) {
     // If we have Crypto, we use an UUIDv4
-    let id = (this.uuid && self.hasOwnProperty('crypto')) ? crypto.randomUUID() : Math.floor(Math.random() * 10000) + 1
+    let id = (this.uuid && self.hasOwnProperty('crypto') && self.crypto.randomUUID) 
+              ? self.crypto.randomUUID() 
+              : (new Date).getTime() + '' + Math.floor(Math.random() * (99999 - 10000) + 10000)
+              
     if (mutation) {
       this.wsData.push({
         id: id,
