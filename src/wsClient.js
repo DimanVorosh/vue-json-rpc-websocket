@@ -80,7 +80,7 @@ export default class WebSocketClient {
 
       // Call the store mutation, if any
       if (this.store) {
-        let current = this.wsData.filter(item => item.id === data.id)[0]
+        let current = this.wsData.filter(item => item.id == data.id)[0]
 
         if (current) {
           this.store.commit(
