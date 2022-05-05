@@ -18,6 +18,9 @@ export default class WebSocketClient {
       if (options.eventAfterMutation) {
         this.eventAfterMutation = options.eventAfterMutation
       }
+      if (options.uuid) {
+        this.uuid = options.uuid
+      }
     }
 
     this.beforeConnected = []
@@ -42,6 +45,7 @@ export default class WebSocketClient {
       reconnectInterval: 0,
       recconectAttempts: 0,
       eventAfterMutation: true,
+      uuid: false,
       store: null
     }
   }
@@ -135,7 +139,8 @@ export default class WebSocketClient {
   }
 
   sendData (method, params, mutation = null) {
-    let id = Math.floor(Math.random() * 10000) + 1
+    // If we have Crypto, we use an UUIDv4
+    let id = (this.uuid && self.hasOwnProperty('crypto')) ? crypto.randomUUID() : Math.floor(Math.random() * 10000) + 1
     if (mutation) {
       this.wsData.push({
         id: id,
