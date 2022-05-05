@@ -1,6 +1,6 @@
 {
   "name": "vue-json-rpc-websocket",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "JSON-RPC Websocket client for VueJS with Vuex integration ",
   "main": "dist/build.js",
   "scripts": {
