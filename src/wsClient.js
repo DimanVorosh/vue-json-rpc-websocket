@@ -1,3 +1,5 @@
+import { v4 as UUIDv4 } from 'uuid'
+
 export default class WebSocketClient {
   constructor (url, options) {
     this.instance = null
@@ -14,6 +16,12 @@ export default class WebSocketClient {
       }
       if (options.store) {
         this.store = options.store
+      }
+      if (options.eventAfterMutation) {
+        this.eventAfterMutation = options.eventAfterMutation
+      }
+      if (options.uuid) {
+        this.uuid = options.uuid
       }
     }
 
@@ -38,6 +46,8 @@ export default class WebSocketClient {
       reconnectEnabled: false,
       reconnectInterval: 0,
       recconectAttempts: 0,
+      eventAfterMutation: true,
+      uuid: false,
       store: null
     }
   }
@@ -74,10 +84,9 @@ export default class WebSocketClient {
     this.instance.onmessage = (msg) => {
       let data = JSON.parse(msg.data)
 
-      if (typeof this.onMessage === 'function') {
-        this.onMessage(data)
-      } else if (this.store) {
-        let current = this.wsData.filter(item => item.id === data.id)[0]
+      // Call the store mutation, if any
+      if (this.store) {
+        let current = this.wsData.filter(item => item.id == data.id)[0]
 
         if (current) {
           this.store.commit(
@@ -87,6 +96,13 @@ export default class WebSocketClient {
         }
 
         this.passToStore('socket_on_message', data)
+      }
+
+      // store not available OR even after mutation set to true, let's try to trigger the onMessage event
+      if ( this.eventAfterMutation || !this.store ) {
+        if (typeof this.onMessage === 'function') {
+          this.onMessage(data)
+        }
       }
     }
 
@@ -125,7 +141,9 @@ export default class WebSocketClient {
   }
 
   sendData (method, params, mutation = null) {
-    let id = Math.floor(Math.random() * 10000) + 1
+    // If we have Crypto, we use an UUIDv4
+    let id = this.uuid ? UUIDv4() : (new Date).getTime() + '' + Math.floor(Math.random() * (99999 - 10000) + 10000)
+
     if (mutation) {
       this.wsData.push({
         id: id,
