@@ -170,3 +170,37 @@ export default new Vuex.Store({
 }
 
 ```
+
+## Commit mutations on notification
+
+You can support multiple notification coming from the server as reply to a request.
+Main difference between a reply and a notification is that the reply ends the request,
+all request must have up to one reply. Supporting notifications, you can send a request
+for a long running task and listen back for notification about status updates and every
+notification commit a mutation (the same set with the first request).
+
+In example, the following request sent to the server:
+```js
+{
+  "jsonrpc": "2.0",
+  "id": "01c19272-a5c7-4f07-904e-47a15b8df8c7",
+  "method": "very.long.command"
+}
+```
+
+ask the server to run a `very.long.command`. The server could reply with multiple notifications, like these:
+```js
+{
+  "jsonrpc": "2.0",
+  "method": "very.long.command/progress",
+  "params": {
+    "request-id": "01c19272-a5c7-4f07-904e-47a15b8df8c7",
+    "value": { "remaining": "80% left" }
+  }
+}
+```
+lack of `id` field means that this is a notification. Inside the `params` we have a `request-id` field with the original request id made by the client.
+The plugin is smart enough to match the ID with the mutation bound to the first request and commit that.
+
+There isn't any official standard for this kind of notification, it's up to the server and to the client agree something in common.
+The plugin allows to customize the field name used to match the id, as long it's placed inside `params` node and the response is a notification (no `id` set)

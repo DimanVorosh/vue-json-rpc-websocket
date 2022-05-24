@@ -20,6 +20,12 @@ export default class WebSocketClient {
       if (options.eventAfterMutation) {
         this.eventAfterMutation = options.eventAfterMutation
       }
+      if (options.commitOnNotification) {
+        this.commitOnNotification = options.commitOnNotification
+      }
+      if (options.notificationIdField) {
+        this.notificationIdField = options.notificationIdField
+      }      
       if (options.uuid) {
         this.uuid = options.uuid
       }
@@ -47,6 +53,8 @@ export default class WebSocketClient {
       reconnectInterval: 0,
       recconectAttempts: 0,
       eventAfterMutation: true,
+      commitOnNotification: true,
+      notificationIdField: 'request-id',
       uuid: false,
       store: null
     }
@@ -86,7 +94,23 @@ export default class WebSocketClient {
 
       // Call the store mutation, if any
       if (this.store) {
-        let current = this.wsData.filter(item => item.id == data.id)[0]
+        let current = this.wsData.filter(item => {
+          // It's a stadard reply (id passed back)
+          if ( data.hasOwnProperty('id') ) {
+            if ( item.id == data.id ) {
+              return true
+            }
+          }
+          
+          // It's a notification (no id passed back)
+          if ( !data.hasOwnProperty('id') ) {
+            if ( this.commitOnNotification && data.hasOwnProperty('params') && data.params.hasOwnProperty(this.notificationIdField) ) {
+              return item.id == data.params[this.notificationIdField]
+            }
+          }
+
+          return false;
+        })[0]
 
         if (current) {
           this.store.commit(
