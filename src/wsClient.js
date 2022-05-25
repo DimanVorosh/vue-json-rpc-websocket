@@ -7,7 +7,7 @@ export default class WebSocketClient {
 
     options = options || {}
     this.options = {...this.defaultOptions(), options}
-    console.log(this.options)
+    console.log(this.defaultOptions(), options)
 
     this.beforeConnected = []
     this.wsData = []
