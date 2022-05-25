@@ -7,30 +7,30 @@ export default class WebSocketClient {
 
     options = options || {}
     this.options = Object.assign(this.defaultOptions(), options)
-    
+
     if (this.options) {
-      if (options.reconnectEnabled) {
-        this.reconnectEnabled = options.reconnectEnabled
+      if (this.options.reconnectEnabled) {
+        this.reconnectEnabled = this.options.reconnectEnabled
         if (this.reconnectEnabled) {
-          this.reconnectInterval = options.reconnectInterval
-          this.reconnectAttempts = options.recconectAttempts
+          this.reconnectInterval = this.options.reconnectInterval
+          this.reconnectAttempts = this.options.recconectAttempts
           this.reconnectCount = 1
         }
       }
-      if (options.store) {
-        this.store = options.store
+      if (this.options.store) {
+        this.store = this.options.store
       }
-      if (options.eventAfterMutation) {
-        this.eventAfterMutation = options.eventAfterMutation
+      if (this.options.eventAfterMutation) {
+        this.eventAfterMutation = this.options.eventAfterMutation
       }
-      if (options.commitOnNotification) {
-        this.commitOnNotification = options.commitOnNotification
+      if (this.options.commitOnNotification) {
+        this.commitOnNotification = this.options.commitOnNotification
       }
-      if (options.notificationIdField) {
-        this.notificationIdField = options.notificationIdField
+      if (this.options.notificationIdField) {
+        this.notificationIdField = this.options.notificationIdField
       }      
-      if (options.uuid) {
-        this.uuid = options.uuid
+      if (this.options.uuid) {
+        this.uuid = this.options.uuid
       }
     }
 
