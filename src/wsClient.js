@@ -54,7 +54,7 @@ export default class WebSocketClient {
       recconectAttempts: 0,
       eventAfterMutation: true,
       commitOnNotification: true,
-      notificationIdField: 'request-id',
+      notificationIdField: 'request_id',
       uuid: false,
       store: null
     }
@@ -98,7 +98,6 @@ export default class WebSocketClient {
           console.log('parsing item, data',item,data);
           // It's a stadard reply (id passed back)
           if ( data.hasOwnProperty('id') ) {
-            console.log('id from data ',data.id)
             if ( item.id == data.id ) {
               return true
             }
@@ -107,6 +106,7 @@ export default class WebSocketClient {
           // It's a notification (no id passed back)
           if ( !data.hasOwnProperty('id') ) {
             if ( this.commitOnNotification && data.hasOwnProperty('params') && data.params.hasOwnProperty(this.notificationIdField) ) {
+              console.log(item.id, data.params[this.notificationIdField])
               return item.id == data.params[this.notificationIdField]
             }
           }
