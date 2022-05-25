@@ -4,32 +4,10 @@ export default class WebSocketClient {
   constructor (url, options) {
     this.instance = null
     this.url = url
-    this.options = options || this.defaultOptions()
-    if (this.options) {
-      if (options.reconnectEnabled) {
-        this.reconnectEnabled = options.reconnectEnabled
-        if (this.reconnectEnabled) {
-          this.reconnectInterval = options.reconnectInterval
-          this.reconnectAttempts = options.recconectAttempts
-          this.reconnectCount = 1
-        }
-      }
-      if (options.store) {
-        this.store = options.store
-      }
-      if (options.eventAfterMutation) {
-        this.eventAfterMutation = options.eventAfterMutation
-      }
-      if (options.commitOnNotification) {
-        this.commitOnNotification = options.commitOnNotification
-      }
-      if (options.notificationIdField) {
-        this.notificationIdField = options.notificationIdField
-      }      
-      if (options.uuid) {
-        this.uuid = options.uuid
-      }
-    }
+
+    options = options || {}
+    this.options = {...this.defaultOptions(), options}
+    console.log(this.options)
 
     this.beforeConnected = []
     this.wsData = []
