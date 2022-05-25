@@ -194,8 +194,11 @@ ask the server to run a `very.long.command`. The server could reply with multipl
   "jsonrpc": "2.0",
   "method": "very.long.command/progress",
   "params": {
-    "request-id": "01c19272-a5c7-4f07-904e-47a15b8df8c7",
-    "value": { "remaining": "80% left" }
+    "request_id": "01c19272-a5c7-4f07-904e-47a15b8df8c7",
+    "progress": {
+      "elapsed": "10%",
+      "remaining": "90%" 
+    }
   }
 }
 ```
