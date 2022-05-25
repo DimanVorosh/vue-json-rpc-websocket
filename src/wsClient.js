@@ -95,9 +95,9 @@ export default class WebSocketClient {
       // Call the store mutation, if any
       if (this.store) {
         let current = this.wsData.filter(item => {
-          console.log('parsing item, data',item,data);
           // It's a stadard reply (id passed back)
           if ( data.hasOwnProperty('id') ) {
+            console.log("it's a reply", data)
             if ( item.id == data.id ) {
               return true
             }
@@ -105,6 +105,7 @@ export default class WebSocketClient {
           
           // It's a notification (no id passed back)
           if ( !data.hasOwnProperty('id') ) {
+            console.log("it's a notification", data, this.commitOnNotification, this.notificationIdField);
             if ( this.commitOnNotification && data.hasOwnProperty('params') && data.params.hasOwnProperty(this.notificationIdField) ) {
               console.log(item.id, data.params[this.notificationIdField])
               return item.id == data.params[this.notificationIdField]
