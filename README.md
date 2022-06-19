@@ -22,7 +22,7 @@ In the Vue app entry file `main.js`
 Vue.use(JRPCWS, 'wss://echo.websocket.org', {
   reconnectEnabled: true,
   reconnectInterval: 5000,
-  recconectAttempts: 3
+  reconnectAttempts: 3
 })
 ```
 
