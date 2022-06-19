@@ -139,7 +139,7 @@ export default class WebSocketClient {
   }
 
   reconnect () {
-    if (this.reconnectCount <= this.reconnectAttempts) {
+    if (this.reconnectAttempts === 0 || this.reconnectCount <= this.reconnectAttempts) {
       this.reconnectCount++
       delete this.instance
       setTimeout(() => {
