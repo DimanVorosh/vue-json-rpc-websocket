@@ -4,35 +4,19 @@ export default class WebSocketClient {
   constructor (url, options) {
     this.instance = null
     this.url = url
+    this.options = { ...this.defaultOptions(), ...options }
 
-    options = options || {}
-    this.options = Object.assign(this.defaultOptions(), options)
-
-    if (this.options) {
-      if (this.options.reconnectEnabled) {
-        this.reconnectEnabled = this.options.reconnectEnabled
-        if (this.reconnectEnabled) {
-          this.reconnectInterval = this.options.reconnectInterval
-          this.reconnectAttempts = this.options.recconectAttempts
-          this.reconnectCount = 1
-        }
-      }
-      if (this.options.store) {
-        this.store = this.options.store
-      }
-      if (this.options.eventAfterMutation) {
-        this.eventAfterMutation = this.options.eventAfterMutation
-      }
-      if (this.options.commitOnNotification) {
-        this.commitOnNotification = this.options.commitOnNotification
-      }
-      if (this.options.notificationIdField) {
-        this.notificationIdField = this.options.notificationIdField
-      }      
-      if (this.options.uuid) {
-        this.uuid = this.options.uuid
-      }
+    if (this.options.reconnectEnabled) {
+      this.reconnectEnabled = this.options.reconnectEnabled
+      this.reconnectInterval = this.options.reconnectInterval
+      this.reconnectAttempts = this.options.reconnectAttempts
+      this.reconnectCount = 1
     }
+    this.store = this.options.store
+    this.eventAfterMutation = this.options.eventAfterMutation
+    this.commitOnNotification = this.options.commitOnNotification
+    this.notificationIdField = this.options.notificationIdField
+    this.uuid = this.options.uuid
 
     this.beforeConnected = []
     this.wsData = []
@@ -54,7 +38,7 @@ export default class WebSocketClient {
     return {
       reconnectEnabled: false,
       reconnectInterval: 0,
-      recconectAttempts: 0,
+      reconnectAttempts: 0,
       eventAfterMutation: true,
       commitOnNotification: true,
       notificationIdField: 'request_id',
