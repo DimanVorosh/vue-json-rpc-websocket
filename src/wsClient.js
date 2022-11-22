@@ -100,9 +100,12 @@ export default class WebSocketClient {
         })[0]
 
         if (current) {
+
           this.store.commit(
             current.mutation,
-            data.result ? data.result : data.params
+            data.result ? data.result 
+                        : data.params ? data.params
+                                      : data.error ? data.error : null
           )
         }
 
