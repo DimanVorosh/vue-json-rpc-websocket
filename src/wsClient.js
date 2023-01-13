@@ -101,11 +101,19 @@ export default class WebSocketClient {
 
         if (current) {
 
+          var responseObj = null;
+          if ( data.result )
+            responseObj = data.result
+          else
+            if ( data.params )
+              responseObj = data.params;
+            else
+              if ( data.error )
+                responseObj = {'error': data.error}
+
           this.store.commit(
             current.mutation,
-            data.result ? data.result 
-                        : data.params ? data.params
-                                      : data.error ? data.error : null
+            responseObj
           )
         }
 
