@@ -4,26 +4,19 @@ export default class WebSocketClient {
   constructor (url, options) {
     this.instance = null
     this.url = url
-    this.options = options || this.defaultOptions()
-    if (this.options) {
-      if (options.reconnectEnabled) {
-        this.reconnectEnabled = options.reconnectEnabled
-        if (this.reconnectEnabled) {
-          this.reconnectInterval = options.reconnectInterval
-          this.reconnectAttempts = options.recconectAttempts
-          this.reconnectCount = 1
-        }
-      }
-      if (options.store) {
-        this.store = options.store
-      }
-      if (options.eventAfterMutation) {
-        this.eventAfterMutation = options.eventAfterMutation
-      }
-      if (options.uuid) {
-        this.uuid = options.uuid
-      }
+    this.options = { ...this.defaultOptions(), ...options }
+
+    if (this.options.reconnectEnabled) {
+      this.reconnectEnabled = this.options.reconnectEnabled
+      this.reconnectInterval = this.options.reconnectInterval
+      this.reconnectAttempts = this.options.reconnectAttempts
+      this.reconnectCount = 1
     }
+    this.store = this.options.store
+    this.eventAfterMutation = this.options.eventAfterMutation
+    this.commitOnNotification = this.options.commitOnNotification
+    this.notificationIdField = this.options.notificationIdField
+    this.uuid = this.options.uuid
 
     this.beforeConnected = []
     this.wsData = []
@@ -45,8 +38,10 @@ export default class WebSocketClient {
     return {
       reconnectEnabled: false,
       reconnectInterval: 0,
-      recconectAttempts: 0,
+      reconnectAttempts: 0,
       eventAfterMutation: true,
+      commitOnNotification: true,
+      notificationIdField: 'request_id',
       uuid: false,
       store: null
     }
@@ -86,12 +81,39 @@ export default class WebSocketClient {
 
       // Call the store mutation, if any
       if (this.store) {
-        let current = this.wsData.filter(item => item.id == data.id)[0]
+        let current = this.wsData.filter(item => {
+          // It's a stadard reply (id passed back)
+          if ( data.hasOwnProperty('id') ) {
+            if ( item.id == data.id ) {
+              return true
+            }
+          }
+          
+          // It's a notification (no id passed back)
+          if ( !data.hasOwnProperty('id') ) {
+            if ( this.commitOnNotification && data.hasOwnProperty('params') && data.params.hasOwnProperty(this.notificationIdField) ) {
+              return item.id == data.params[this.notificationIdField]
+            }
+          }
+
+          return false;
+        })[0]
 
         if (current) {
+
+          var responseObj = null;
+          if ( data.result )
+            responseObj = data.result
+          else
+            if ( data.params )
+              responseObj = data.params;
+            else
+              if ( data.error )
+                responseObj = {'error': data.error}
+
           this.store.commit(
             current.mutation,
-            data.result ? data.result : data.params
+            responseObj
           )
         }
 
@@ -128,7 +150,7 @@ export default class WebSocketClient {
   }
 
   reconnect () {
-    if (this.reconnectCount <= this.reconnectAttempts) {
+    if (this.reconnectAttempts === 0 || this.reconnectCount <= this.reconnectAttempts) {
       this.reconnectCount++
       delete this.instance
       setTimeout(() => {
