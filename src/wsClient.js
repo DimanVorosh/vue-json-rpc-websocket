@@ -99,7 +99,8 @@ export default class WebSocketClient {
           return false;
         })[0]
 
-        
+        if (current) {
+
           var responseObj = null;
           if ( data.result )
             responseObj = data.result
@@ -110,22 +111,10 @@ export default class WebSocketClient {
               if ( data.error )
                 responseObj = {'error': data.error}
 
-        // Mutation found, let's call that
-        if (current) {
           this.store.commit(
             current.mutation,
             responseObj
           )
-        } else {
-          // Mutation not found, let's try to call a mutation with the name equal to the "method", if any
-          if ( data.hasOwnProperty('method') ) {
-            let commitName = 'jsonrpc/' + data.method
-            console.log('json-rpc-websocket: got message, trying to commit the mutation "'+commitName+'"', data)
-            this.store.commit(
-              commitName,
-              responseObj
-            )
-          }
         }
 
         this.passToStore('socket_on_message', data)
